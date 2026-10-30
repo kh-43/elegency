@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالم الأناقة للتجارة والتسويق - النظام المالي المتقدم</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة Supabase السحابية الرسمية -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #d97706;
+            --primary-hover: #b45309;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --info-color: #2563eb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* شاشة تسجيل الدخول الآمنة */
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 15px;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-right: 6px solid var(--primary-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-logo {
+            width: 65px;
+            height: 65px;
+            background: #fff8f0;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        /* الهيدر العلوي */
+        .header-section {
+            background: var(--bg-card);
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-right: 6px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            width: 65px;
+            height: 65px;
+            background: #fff8f0;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-fallback {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-main);
+        }
+
+        .header-text p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover { background-color: #e2e8f0; }
+        .btn-export { color: var(--success-color); border-color: #a7f3d0; background-color: #ecfdf5; }
+        .btn-export:hover { background-color: #d1fae5; }
+        .btn-logout { color: var(--danger-color); border-color: #fecaca; background-color: #fef2f2; }
+
+        /* شريط التنقل بين التبويبات */
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-card);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 16px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { background: #f1f5f9; color: var(--primary-color); }
+        .tab-btn.active { background: var(--primary-color); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* لوحة المؤشرات السريعة */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dash-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .dash-card h4 { margin: 0 0 8px 0; font-size: 13px; color: var(--text-muted); }
+        .dash-card .dash-value { margin: 0; font-size: 22px; font-weight: bold; color: var(--text-main); }
+
+        /* نماذج الإدخال والبطاقات */
+        .form-section {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 17px;
+            color: var(--primary-color);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-main); }
+        .input-group input, .input-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+        }
+        .input-group input:focus, .input-group select:focus { border-color: var(--primary-color); }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+
+        /* الجداول العامة */
+        .table-wrapper {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            padding: 16px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .table-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; color: var(--text-main); }
+        table { width: 100%; border-collapse: collapse; text-align: right; min-width: 800px; }
+        th { background-color: #f8fafc; color: var(--text-muted); padding: 10px; font-weight: 700; border-bottom: 2px solid var(--border-color); font-size: 12px; white-space: nowrap; }
+        td { padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-main); white-space: nowrap; }
+        tr:hover td { background-color: #f8fafc; }
+
+        .action-btn {
+            background: none; border: none; cursor: pointer; font-family: 'Tajawal', Arial, sans-serif; font-weight: 500; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-edit { color: var(--info-color); background: #eff6ff; }
+        .btn-delete { color: var(--danger-color); background: #fef2f2; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #statementSection, #statementSection * { visibility: visible; }
+            #statementSection { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; background: white; }
+            .no-print { display: none !important; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .header-section { flex-direction: column; align-items: stretch; }
+            .backup-actions { justify-content: space-between; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول الآمنة النظيفة -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo"><i class="fa-solid fa-shirt"></i></div>
+                <h2 style="margin: 0; font-size: 18px; color: var(--text-main);">عالم الأناقة للتجارة والتسويق</h2>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">يرجى تسجيل الدخول للوصول إلى النظام المالي</p>
+            </div>
+            <form onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="input-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="loginUsername" required autocomplete="off" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="input-group" style="position: relative;">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required autocomplete="new-password" placeholder="أدخل كلمة المرور" style="padding-left: 35px;">
+                    <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; left: 8px; top: 28px; background: none; border: none; cursor: pointer; color: var(--text-muted);">
+                        <i id="togglePasswordIcon" class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div id="loginError" style="color: var(--danger-color); font-size: 12px; text-align: center; display: none; font-weight: bold;">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+                <button type="submit" class="btn-submit" style="margin-top: 5px;">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="appContainer" class="container" style="display: none;">
+
+        <!-- الهيدر والنسخ الاحتياطي -->
+        <div class="header-section">
+            <div class="header-left">
+                <div class="logo-box" onclick="document.getElementById('logoUpload').click()" title="انقر لتغيير الشعار">
+                    <img id="appLogoImg" src="" alt="شعار عالم الأناقة" style="display: none;" onerror="this.style.display='none';">
+                    <span class="logo-fallback"><i class="fa-solid fa-shirt"></i></span>
+                </div>
+                <input type="file" id="logoUpload" style="display: none;" accept="image/*" onchange="changeLogo(event)">
+                <div class="header-text">
+                    <h1>عالم الأناقة للتجارة والتسويق</h1>
+                    <p id="headerSubtitle">إدارة الحسابات، المبيعات والديون</p>
+                </div>
+            </div>
+            <div class="backup-actions">
+                <button type="button" class="btn-action btn-export" onclick="exportData()">تصدير نسخة JSON</button>
+                <button type="button" class="btn-action" onclick="document.getElementById('importFile').click()">استيراد نسخة</button>
+                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+                <button type="button" class="btn-action btn-logout" onclick="handleLogout()">تسجيل خروج</button>
+            </div>
+        </div>
+
+        <!-- شريط التنقل بين التبويبات -->
+        <div class="nav-tabs" id="mainNavTabs">
+            <button class="tab-btn" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> لوحة المؤشرات والعمليات</button>
+            <button class="tab-btn" id="nav-statements" onclick="switchTab('statements')"><i class="fa-solid fa-file-invoice-dollar"></i> كشوف الحسابات</button>
+            <button class="tab-btn" id="nav-records" onclick="switchTab('records')"><i class="fa-solid fa-table"></i> سجل جميع العمليات</button>
+            <button class="tab-btn" id="nav-users" onclick="switchTab('users')"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين</button>
+        </div>
+
+        <!-- تبويب 1: لوحة المؤشرات وإضافة عملية -->
+        <div id="tab-dashboard" class="tab-content">
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h4>إجمالي المبيعات الكلية</h4>
+                    <p id="statTotalSales" class="dash-value">0</p>
+                </div>
+                <div class="dash-card">
+                    <h4>إجمالي المتبقي على الزبائن (ديون لك)</h4>
+                    <p id="statCustomerDebt" class="dash-value" style="color: var(--danger-color);">0</p>
+                </div>
+                <div class="dash-card">
+                    <h4>إجمالي المتبقي للموردين (ديون عليك)</h4>
+                    <p id="statSupplierDebt" class="dash-value" style="color: var(--primary-color);">0</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>إضافة عملية حجز وحساب جديدة</h3>
+                <form id="orderForm" onsubmit="addRecord(event)">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>التاريخ</label>
+                            <input type="date" id="orderDate" required>
+                        </div>
+                        <div class="input-group">
+                            <label>اسم الطلب (الصنف)</label>
+                            <input type="text" id="itemName" list="itemsList" required placeholder="اختر أو اكتب الصنف">
+                            <datalist id="itemsList"></datalist>
+                        </div>
+                        <div class="input-group">
+                            <label>اسم الزبون (العميل)</label>
+                            <input type="text" id="customerName" list="customersList" required placeholder="اختر أو اكتب الزبون">
+                            <datalist id="customersList"></datalist>
+                        </div>
+                        <div class="input-group">
+                            <label>سعر البيع</label>
+                            <input type="number" id="salesPrice" required min="0" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>الواصل (المدفوع من العميل)</label>
+                            <input type="number" id="amountReceived" required min="0" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>اسم المورد</label>
+                            <input type="text" id="supplierName" list="suppliersList" required placeholder="اختر أو اكتب المورد">
+                            <datalist id="suppliersList"></datalist>
+                        </div>
+                        <div class="input-group">
+                            <label>سعر المورد (التكلفة)</label>
+                            <input type="number" id="supplierPrice" required min="0" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>المدفوع للمورد</label>
+                            <input type="number" id="amountPaidToSupplier" required min="0" value="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" style="margin-top: 10px;">إضافة العملية إلى النظام</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- تبويب 2: كشوف الحسابات -->
+        <div id="tab-statements" class="tab-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="form-section" style="margin-bottom: 0;">
+                    <h3>كشف حساب الزبائن</h3>
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <input type="text" id="customerSearchInput" placeholder="بحث عن اسم زبون..." oninput="filterCustomerDropdown()">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <select id="customerSelect" onchange="showCustomerStatement()">
+                            <option value="">-- اختر الزبون لعرض كشفه --</option>
+                        </select>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px dashed var(--border-color); font-size: 13px;">
+                        إجمالي المتبقي على الزبون: <strong id="customerCardTotal" style="color: var(--danger-color);">0</strong>
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-bottom: 0;">
+                    <h3>كشف حساب الموردين</h3>
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <input type="text" id="supplierSearchInput" placeholder="بحث عن اسم مورد..." oninput="filterSupplierDropdown()">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <select id="supplierSelect" onchange="showSupplierStatement()">
+                            <option value="">-- اختر المورد لعرض كشفه --</option>
+                        </select>
+                    </div>
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px dashed var(--border-color); font-size: 13px;">
+                        إجمالي المتبقي للمورد: <strong id="supplierCardTotal" style="color: var(--primary-color);">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div id="statementSection" class="form-section" style="display: none; border: 2px solid var(--primary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <h3 id="statementTitle" style="margin: 0; border: none; padding: 0;">كشف حساب تفصيلي</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="action-btn" onclick="window.print()" style="background: var(--info-color); color: white;">🖨️ طباعة الكشف</button>
+                        <button class="action-btn" onclick="closeStatement()" style="background: #fee2e2; color: var(--danger-color);">إغلاق ✕</button>
+                    </div>
+                </div>
+                <div id="statementSummaryBox" style="margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 13px;"></div>
+                <div class="table-wrapper" style="box-shadow: none; padding: 0; border: none; margin: 0;">
+                    <table>
+                        <thead id="statementThead"></thead>
+                        <tbody id="statementTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب 3: سجل العمليات -->
+        <div id="tab-records" class="tab-content">
+            <div class="table-wrapper">
+                <div class="table-title">سجل جميع العمليات الحسابية العامة</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>اسم الطلب</th>
+                            <th>الزبون</th>
+                            <th>سعر البيع</th>
+                            <th>الواصل</th>
+                            <th>المتبقي للزبون</th>
+                            <th>المورد</th>
+                            <th>سعر المورد</th>
+                            <th>المدفوع للمورد</th>
+                            <th>المتبقي للمورد</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تبويب 4: إدارة المستخدمين والصلاحيات وتعديل كلمات السر -->
+        <div id="tab-users" class="tab-content">
+            <div class="form-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin: 0; border: none; padding: 0;">إدارة المستخدمين وصلاحيات الوصول وتعديل كلمات السر</h3>
+                    <button class="btn-action btn-export" onclick="openUserModal()">إضافة مستخدم جديد</button>
+                </div>
+                <div class="table-wrapper" style="box-shadow: none; padding: 0; border: none; margin: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>الاسم الكامل</th>
+                                <th>صلاحيات الأقسام الممنوحة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- مودال تعديل عملية مالية -->
+    <div id="editRecordModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; padding: 15px;">
+        <div style="background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h3 style="margin-top: 0; color: var(--primary-color);">تعديل بيانات العملية المالیة</h3>
+            <form id="editRecordForm" onsubmit="saveEditedRecord(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" id="editRecordId">
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="input-group">
+                        <label>التاريخ</label>
+                        <input type="date" id="editOrderDate" required>
+                    </div>
+                    <div class="input-group">
+                        <label>اسم الطلب (الصنف)</label>
+                        <input type="text" id="editItemName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>اسم الزبون</label>
+                        <input type="text" id="editCustomerName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>سعر البيع</label>
+                        <input type="number" id="editSalesPrice" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>الواصل</label>
+                        <input type="number" id="editAmountReceived" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>اسم المورد</label>
+                        <input type="text" id="editSupplierName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>سعر المورد</label>
+                        <input type="number" id="editSupplierPrice" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>المدفوع للمورد</label>
+                        <input type="number" id="editAmountPaidToSupplier" required min="0">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn-submit" style="flex: 1;">حفظ التعديلات</button>
+                    <button type="button" class="btn-action" style="flex: 1;" onclick="closeEditRecordModal()">إغلاق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال إضافة / تعديل مستخدم -->
+    <div id="userModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; padding: 15px;">
+        <div style="background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h3 id="userModalTitle" style="margin-top: 0; color: var(--primary-color);">إضافة مستخدم جديد</h3>
+            <form id="userForm" onsubmit="saveUser(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" id="editingUserOriginal">
+                <div class="input-group">
+                    <label>اسم المستخدم (للدخول)</label>
+                    <input type="text" id="uUsername" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="uFullName" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>كلمة المرور</label>
+                    <input type="text" id="uPassword" required autocomplete="new-password" placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                <div class="input-group">
+                    <label>صلاحيات الوصول للأقسام:</label>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 6px; font-size: 13px;">
+                        <label><input type="checkbox" value="dashboard" class="perm-chk" checked> لوحة المؤشرات والعمليات</label>
+                        <label><input type="checkbox" value="statements" class="perm-chk" checked> كشوف الحسابات</label>
+                        <label><input type="checkbox" value="records" class="perm-chk" checked> سجل جميع العمليات</label>
+                        <label><input type="checkbox" value="users" class="perm-chk"> إدارة المستخدمين والصلاحيات</label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <button type="submit" class="btn-submit" style="flex: 1;">حفظ المستخدم</button>
+                    <button type="button" class="btn-action" style="flex: 1;" onclick="closeUserModal()">إغلاق</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript الخاص بالمنظومة والربط بقاعدة البيانات الثانية Supabase -->
+    <script>
+        // إعدادات قاعدة البيانات الأولى (الرئيسية)
+        const SUPABASE_URL_1 = 'https://rnkyzkkscqrfmlkfuwhd.supabase.co';
+        const SUPABASE_KEY_1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJua3l6a2tzY3FyZm1sa2Z1d2hkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTA2NTcsImV4cCI6MjEwODc4NjY1N30.O1ysUAVsgvSnzudy6atr4UUXc2kElL_-xu8T2WcxvwI';
+        const supabaseClient1 = window.supabase.createClient(SUPABASE_URL_1, SUPABASE_KEY_1);
+
+        // إعدادات قاعدة البيانات الثانية (الاحتياطية / البديلة للمزامنة المزدوجة)
+        // قم بتعديل الرابط والمفتاح أدناه ببيانات مشروع Supabase الثاني الخاص بك
+        const SUPABASE_URL_2 = 'https://YOUR_SECOND_SUPABASE_URL.supabase.co';
+        const SUPABASE_KEY_2 = 'YOUR_SECOND_SUPABASE_ANON_KEY';
+        const supabaseClient2 = window.supabase.createClient(SUPABASE_URL_2, SUPABASE_KEY_2);
+
+        const ALL_TABS = [
+            { id: 'dashboard', name: 'لوحة المؤشرات والعمليات' },
+            { id: 'statements', name: 'كشوف الحسابات' },
+            { id: 'records', name: 'سجل جميع العمليات' },
+            { id: 'users', name: 'إدارة المستخدمين' }
+        ];
+
+        let appData = {
+            currentUser: null,
+            users: [
+                { username: 'admin', fullName: 'مدير النظام الرئيسي', password: '1234', permissions: ['dashboard', 'statements', 'records', 'users'] }
+            ],
+            records: []
+        };
+
+        document.getElementById('orderDate').valueAsDate = new Date();
+
+        window.onload = async function() {
+            loadFromLocalStorage();
+            // مزامنة البيانات تلقائياً من قاعدة البيانات الأولى عند فتح التطبيق
+            await syncDataFromCloud();
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        };
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('elegance_permissions_system_v5');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.users) appData = parsed;
+                } catch(e) { console.error(e); }
+            }
+            const savedLogo = localStorage.getItem('elegance_app_logo_v5');
+            if (savedLogo) {
+                const img = document.getElementById('appLogoImg');
+                img.src = savedLogo;
+                img.style.display = 'block';
+                document.querySelector('.logo-fallback').style.display = 'none';
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('elegance_permissions_system_v5', JSON.stringify(appData));
+            updateDashboardStats();
+        }
+
+        // --- المزامنة المزدوجة مع قواعد البيانات السحابية (Supabase 1 و Supabase 2) ---
+        async function syncDataFromCloud() {
+            try {
+                // محاولة الجلب من قاعدة البيانات الأولى
+                const { data: usersData1 } = await supabaseClient1.from('users').select('*');
+                const { data: recordsData1 } = await supabaseClient1.from('records').select('*');
+                
+                if (usersData1 && usersData1.length > 0) appData.users = usersData1;
+                if (recordsData1) appData.records = recordsData1;
+                
+                saveToLocalStorage();
+                renderAll();
+                console.log("تمت المزامنة بنجاح من قاعدة البيانات الأولى.");
+            } catch (err) {
+                console.error("خطأ في المزامنة مع قاعدة البيانات الأولى:", err);
+                // محاولة احتياطية من قاعدة البيانات الثانية إذا فشلت الأولى
+                try {
+                    const { data: usersData2 } = await supabaseClient2.from('users').select('*');
+                    const { data: recordsData2 } = await supabaseClient2.from('records').select('*');
+                    if (usersData2 && usersData2.length > 0) appData.users = usersData2;
+                    if (recordsData2) appData.records = recordsData2;
+                    saveToLocalStorage();
+                    renderAll();
+                    console.log("تمت المزامنة بنجاح من قاعدة البيانات الثانية (الاحتياطية).");
+                } catch (e2) {
+                    console.error("فشلت المزامنة مع كلا القاعدتين:", e2);
+                }
+            }
+        }
+
+        async function saveToBothClouds(type, dataObj) {
+            // حفظ في قاعدة البيانات الأولى
+            try {
+                if (type === 'record') {
+                    await supabaseClient1.from('records').upsert([dataObj]);
+                } else if (type === 'user') {
+                    await supabaseClient1.from('users').upsert([dataObj]);
+                }
+            } catch (err) {
+                console.error("خطأ بالحفظ في قاعدة البيانات الأولى:", err);
+            }
+
+            // حفظ في قاعدة البيانات الثانية (الجديدة)
+            try {
+                if (type === 'record') {
+                    await supabaseClient2.from('records').upsert([dataObj]);
+                } else if (type === 'user') {
+                    await supabaseClient2.from('users').upsert([dataObj]);
+                }
+            } catch (err2) {
+                console.error("خطأ بالحفظ في قاعدة البيانات الثانية:", err2);
+            }
+        }
+
+        async function deleteFromBothClouds(type, idValue) {
+            try {
+                if (type === 'record') {
+                    await supabaseClient1.from('records').delete().eq('id', idValue);
+                    await supabaseClient2.from('records').delete().eq('id', idValue);
+                } else if (type === 'user') {
+                    await supabaseClient1.from('users').delete().eq('username', idValue);
+                    await supabaseClient2.from('users').delete().eq('username', idValue);
+                }
+            } catch (err) {
+                console.error("خطأ بالحذف من السحابة:", err);
+            }
+        }
+
+        // --- المصادقة وتسجيل الدخول ---
+        function togglePasswordVisibility() {
+            const pwd = document.getElementById('loginPassword');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                pwd.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+            const err = document.getElementById('loginError');
+
+            const found = appData.users.find(usr => usr.username.trim() === u && usr.password.trim() === p);
+            if (found) {
+                if (found.username === 'admin') {
+                    found.permissions = ALL_TABS.map(t => t.id);
+                }
+
+                appData.currentUser = found;
+                err.style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                document.getElementById('headerSubtitle').textContent = `المستخدم: ${found.fullName}`;
+
+                buildNavigation();
+                renderAll();
+            } else {
+                err.style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            appData.currentUser = null;
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function buildNavigation() {
+            const userPerms = appData.currentUser.username === 'admin' ? ALL_TABS.map(t => t.id) : (appData.currentUser.permissions || []);
+
+            ALL_TABS.forEach(t => {
+                const btn = document.getElementById('nav-' + t.id);
+                if (btn) {
+                    if (userPerms.includes(t.id)) {
+                        btn.style.display = 'inline-block';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                }
+            });
+
+            const first = ALL_TABS.find(t => userPerms.includes(t.id));
+            if (first) switchTab(first.id);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            if (tabId === 'dashboard' || tabId === 'statements') {
+                updateDashboardStats();
+                updateDropdowns();
+            } else if (tabId === 'records') {
+                renderTable();
+            } else if (tabId === 'users') {
+                renderUsersTable();
+            }
+        }
+
+        function renderAll() {
+            updateDashboardStats();
+            renderTable();
+            updateDropdowns();
+            if (appData.currentUser && appData.currentUser.username === 'admin') renderUsersTable();
+        }
+
+        // --- الشعار ---
+        function changeLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                localStorage.setItem('elegance_app_logo_v5', base64);
+                const img = document.getElementById('appLogoImg');
+                img.src = base64;
+                img.style.display = 'block';
+                document.querySelector('.logo-fallback').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- المؤشرات والعمليات ---
+        function updateDashboardStats() {
+            let totalSales = 0, totalCustDebt = 0, totalSuppDebt = 0;
+            appData.records.forEach(r => {
+                totalSales += r.salesPrice;
+                totalCustDebt += (r.salesPrice - r.amountReceived);
+                totalSuppDebt += (r.supplierPrice - r.amountPaidToSupplier);
+            });
+            document.getElementById('statTotalSales').textContent = totalSales.toLocaleString();
+            document.getElementById('statCustomerDebt').textContent = totalCustDebt.toLocaleString();
+            document.getElementById('statSupplierDebt').textContent = totalSuppDebt.toLocaleString();
+        }
+
+        function addRecord(event) {
+            event.preventDefault();
+            const newItem = {
+                id: Date.now(),
+                orderDate: document.getElementById('orderDate').value,
+                itemName: document.getElementById('itemName').value.trim(),
+                customerName: document.getElementById('customerName').value.trim(),
+                salesPrice: parseFloat(document.getElementById('salesPrice').value) || 0,
+                amountReceived: parseFloat(document.getElementById('amountReceived').value) || 0,
+                supplierName: document.getElementById('supplierName').value.trim(),
+                supplierPrice: parseFloat(document.getElementById('supplierPrice').value) || 0,
+                amountPaidToSupplier: parseFloat(document.getElementById('amountPaidToSupplier').value) || 0
+            };
+
+            appData.records.push(newItem);
+            saveToLocalStorage();
+            saveToBothClouds('record', newItem);
+            renderTable();
+            updateDropdowns();
+
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderDate').valueAsDate = new Date();
+            alert('تمت إضافة العملية بنجاح والمزامنة مع قواعد البيانات!');
+        }
+
+        // --- تعديل وتحديث العمليات (أيقونة/زر التعديل) ---
+        function editRecord(id) {
+            const item = appData.records.find(r => r.id === id);
+            if (!item) return;
+
+            document.getElementById('editRecordId').value = item.id;
+            document.getElementById('editOrderDate').value = item.orderDate;
+            document.getElementById('editItemName').value = item.itemName;
+            document.getElementById('editCustomerName').value = item.customerName;
+            document.getElementById('editSalesPrice').value = item.salesPrice;
+            document.getElementById('editAmountReceived').value = item.amountReceived;
+            document.getElementById('editSupplierName').value = item.supplierName;
+            document.getElementById('editSupplierPrice').value = item.supplierPrice;
+            document.getElementById('editAmountPaidToSupplier').value = item.amountPaidToSupplier;
+
+            document.getElementById('editRecordModal').style.display = 'flex';
+        }
+
+        function closeEditRecordModal() {
+            document.getElementById('editRecordModal').style.display = 'none';
+        }
+
+        function saveEditedRecord(event) {
+            event.preventDefault();
+            const id = parseInt(document.getElementById('editRecordId').value);
+            const idx = appData.records.findIndex(r => r.id === id);
+            if (idx === -1) return;
+
+            const updatedItem = {
+                id: id,
+                orderDate: document.getElementById('editOrderDate').value,
+                itemName: document.getElementById('editItemName').value.trim(),
+                customerName: document.getElementById('editCustomerName').value.trim(),
+                salesPrice: parseFloat(document.getElementById('editSalesPrice').value) || 0,
+                amountReceived: parseFloat(document.getElementById('editAmountReceived').value) || 0,
+                supplierName: document.getElementById('editSupplierName').value.trim(),
+                supplierPrice: parseFloat(document.getElementById('editSupplierPrice').value) || 0,
+                amountPaidToSupplier: parseFloat(document.getElementById('editAmountPaidToSupplier').value) || 0
+            };
+
+            appData.records[idx] = updatedItem;
+            saveToLocalStorage();
+            saveToBothClouds('record', updatedItem);
+            renderTable();
+            updateDropdowns();
+            closeStatement();
+            closeEditRecordModal();
+            alert('تم تعديل وحفظ السجل بنجاح!');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+                appData.records = appData.records.filter(r => r.id !== id);
+                saveToLocalStorage();
+                deleteFromBothClouds('record', id);
+                renderTable();
+                updateDropdowns();
+                closeStatement();
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            if (appData.records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted);">لا توجد عمليات مسجلة حتى الآن</td></tr>`;
+                return;
+            }
+
+            appData.records.forEach(item => {
+                const customerRemaining = item.salesPrice - item.amountReceived;
+                const supplierRemaining = item.supplierPrice - item.amountPaidToSupplier;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.orderDate}</td>
+                        <td><strong>${item.itemName}</strong></td>
+                        <td>${item.customerName}</td>
+                        <td>${item.salesPrice.toLocaleString()}</td>
+                        <td>${item.amountReceived.toLocaleString()}</td>
+                        <td style="font-weight: bold; color: ${customerRemaining > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">${customerRemaining.toLocaleString()}</td>
+                        <td>${item.supplierName}</td>
+                        <td>${item.supplierPrice.toLocaleString()}</td>
+                        <td>${item.amountPaidToSupplier.toLocaleString()}</td>
+                        <td style="font-weight: bold; color: ${supplierRemaining > 0 ? 'var(--primary-color)' : 'var(--success-color)'};">${supplierRemaining.toLocaleString()}</td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editRecord(${item.id})" title="تعديل السجل"><i class="fa-solid fa-pen-to-square"></i> تعديل</button>
+                            <button class="action-btn btn-delete" onclick="deleteRecord(${item.id})" style="margin-right: 4px;" title="حذف السجل"><i class="fa-solid fa-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- القوائم والكشوف ---
+        function updateDropdowns() {
+            filterCustomerDropdown();
+            filterSupplierDropdown();
+            updateFormDatalists();
+        }
+
+        function updateFormDatalists() {
+            const uniqueItems = [...new Set(appData.records.map(r => r.itemName))].filter(Boolean);
+            const uniqueCustomers = [...new Set(appData.records.map(r => r.customerName))].filter(Boolean);
+            const uniqueSuppliers = [...new Set(appData.records.map(r => r.supplierName))].filter(Boolean);
+
+            document.getElementById('itemsList').innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
+            document.getElementById('customersList').innerHTML = uniqueCustomers.map(c => `<option value="${c}">`).join('');
+            document.getElementById('suppliersList').innerHTML = uniqueSuppliers.map(s => `<option value="${s}">`).join('');
+        }
+
+        function filterCustomerDropdown() {
+            const filter = document.getElementById('customerSearchInput').value.toLowerCase();
+            const select = document.getElementById('customerSelect');
+            const val = select.value;
+            const unique = [...new Set(appData.records.map(r => r.customerName))].filter(Boolean);
+
+            select.innerHTML = `<option value="">-- اختر الزبون لعرض كشفه --</option>`;
+            unique.filter(n => n.toLowerCase().includes(filter)).forEach(c => {
+                select.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            select.value = val;
+        }
+
+        function filterSupplierDropdown() {
+            const filter = document.getElementById('supplierSearchInput').value.toLowerCase();
+            const select = document.getElementById('supplierSelect');
+            const val = select.value;
+            const unique = [...new Set(appData.records.map(r => r.supplierName))].filter(Boolean);
+
+            select.innerHTML = `<option value="">-- اختر المورد لعرض كشفه --</option>`;
+            unique.filter(n => n.toLowerCase().includes(filter)).forEach(s => {
+                select.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+            select.value = val;
+        }
+
+        function showCustomerStatement() {
+            const customerName = document.getElementById('customerSelect').value;
+            document.getElementById('supplierSelect').value = "";
+            if (!customerName) { closeStatement(); return; }
+
+            const filtered = appData.records.filter(r => r.customerName === customerName);
+            let totalSales = 0, totalReceived = 0;
+            filtered.forEach(r => { totalSales += r.salesPrice; totalReceived += r.amountReceived; });
+            const rem = totalSales - totalReceived;
+
+            document.getElementById('customerCardTotal').textContent = rem.toLocaleString();
+            document.getElementById('statementSection').style.display = 'block';
+            document.getElementById('statementTitle').textContent = `كشف حساب الزبون: (${customerName})`;
+            document.getElementById('statementSummaryBox').innerHTML = `
+                <strong>إجمالي المبيعات:</strong> ${totalSales.toLocaleString()} | 
+                <strong>الواصل:</strong> ${totalReceived.toLocaleString()} | 
+                <strong>المتبقي:</strong> <span style="color:var(--danger-color); font-weight:bold;">${rem.toLocaleString()}</span>
+            `;
+
+            document.getElementById('statementThead').innerHTML = `
+                <tr>
+                    <th>التاريخ</th>
+                    <th>اسم الطلب (الصنف)</th>
+                    <th>المورد المرتبط</th>
+                    <th>سعر البيع</th>
+                    <th>الواصل</th>
+                    <th>المتبقي</th>
+                </tr>
+            `;
+
+            const tbody = document.getElementById('statementTbody');
+            tbody.innerHTML = '';
+            filtered.forEach(item => {
+                const itemRem = item.salesPrice - item.amountReceived;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.orderDate}</td>
+                        <td><strong>${item.itemName}</strong></td>
+                        <td>${item.supplierName}</td>
+                        <td>${item.salesPrice.toLocaleString()}</td>
+                        <td>${item.amountReceived.toLocaleString()}</td>
+                        <td style="font-weight:bold; color: ${itemRem > 0 ? 'var(--danger-color)' : 'var(--success-color)'};">${itemRem.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function showSupplierStatement() {
+            const supplierName = document.getElementById('supplierSelect').value;
+            document.getElementById('customerSelect').value = "";
+            if (!supplierName) { closeStatement(); return; }
+
+            const filtered = appData.records.filter(r => r.supplierName === supplierName);
+            let totalCost = 0, totalPaid = 0;
+            filtered.forEach(r => { totalCost += r.supplierPrice; totalPaid += r.amountPaidToSupplier; });
+            const rem = totalCost - totalPaid;
+
+            document.getElementById('supplierCardTotal').textContent = rem.toLocaleString();
+            document.getElementById('statementSection').style.display = 'block';
+            document.getElementById('statementTitle').textContent = `كشف حساب المورد: (${supplierName})`;
+            document.getElementById('statementSummaryBox').innerHTML = `
+                <strong>إجمالي التكلفة:</strong> ${totalCost.toLocaleString()} | 
+                <strong>المدفوع:</strong> ${totalPaid.toLocaleString()} | 
+                <strong>المتبقي:</strong> <span style="color:var(--primary-color); font-weight:bold;">${rem.toLocaleString()}</span>
+            `;
+
+            document.getElementById('statementThead').innerHTML = `
+                <tr>
+                    <th>التاريخ</th>
+                    <th>اسم الطلب (الصنف)</th>
+                    <th>الزبون المرتبط</th>
+                    <th>سعر التكلفة</th>
+                    <th>المدفوع</th>
+                    <th>المتبقي</th>
+                </tr>
+            `;
+
+            const tbody = document.getElementById('statementTbody');
+            tbody.innerHTML = '';
+            filtered.forEach(item => {
+                const itemRem = item.supplierPrice - item.amountPaidToSupplier;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.orderDate}</td>
+                        <td><strong>${item.itemName}</strong></td>
+                        <td>${item.customerName}</td>
+                        <td>${item.supplierPrice.toLocaleString()}</td>
+                        <td>${item.amountPaidToSupplier.toLocaleString()}</td>
+                        <td style="font-weight:bold; color: ${itemRem > 0 ? 'var(--primary-color)' : 'var(--success-color)'};">${itemRem.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function closeStatement() {
+            document.getElementById('statementSection').style.display = 'none';
+            const cSel = document.getElementById('customerSelect');
+            const sSel = document.getElementById('supplierSelect');
+            if (cSel) cSel.value = "";
+            if (sSel) sSel.value = "";
+        }
+
+        // --- إدارة المستخدمين والصلاحيات وتعديل كلمة السر ---
+        function renderUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            appData.users.forEach(u => {
+                const isSuper = u.username === 'admin';
+                const permsList = isSuper ? ['لوحة المؤشرات والعمليات', 'كشوف الحسابات', 'سجل جميع العمليات', 'إدارة المستخدمين والصلاحيات'] : (u.permissions || []).map(p => {
+                    const found = ALL_TABS.find(t => t.id === p);
+                    return found ? found.name : '';
+                }).filter(Boolean);
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${u.username}</strong> ${isSuper ? '<span style="color:var(--primary-color); font-size:11px;">(مدير رئيسي)</span>' : ''}</td>
+                        <td>${u.fullName}</td>
+                        <td>${permsList.join('، ')}</td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editUser('${u.username}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                            ${!isSuper ? `<button class="action-btn btn-delete" onclick="deleteUser('${u.username}')" style="margin-right: 5px;"><i class="fa-solid fa-trash"></i> حذف</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openUserModal() {
+            document.getElementById('userForm').reset();
+            document.getElementById('editingUserOriginal').value = '';
+            document.getElementById('userModalTitle').textContent = 'إضافة مستخدم جديد وصلاحياته';
+            document.querySelectorAll('.perm-chk').forEach(c => c.checked = true);
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+
+        function editUser(username) {
+            const u = appData.users.find(usr => usr.username === username);
+            if (!u) return;
+
+            document.getElementById('userModalTitle').textContent = 'تعديل بيانات المستخدم وكلمة السر والصلاحيات';
+            document.getElementById('editingUserOriginal').value = u.username;
+            document.getElementById('uUsername').value = u.username;
+            document.getElementById('uFullName').value = u.fullName;
+            document.getElementById('uPassword').value = u.password;
+
+            document.querySelectorAll('.perm-chk').forEach(c => {
+                c.checked = username === 'admin' || (u.permissions && u.permissions.includes(c.value));
+            });
+
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function saveUser(event) {
+            event.preventDefault();
+            const original = document.getElementById('editingUserOriginal').value;
+            const uUsername = document.getElementById('uUsername').value.trim();
+            const uFullName = document.getElementById('uFullName').value.trim();
+            const uPassword = document.getElementById('uPassword').value.trim();
+
+            let perms = [];
+            if (uUsername === 'admin') {
+                perms = ALL_TABS.map(t => t.id);
+            } else {
+                document.querySelectorAll('.perm-chk').forEach(c => {
+                    if (c.checked) perms.push(c.value);
+                });
+            }
+
+            const userObj = { username: uUsername, fullName: uFullName, password: uPassword, permissions: perms };
+
+            if (original) {
+                const idx = appData.users.findIndex(usr => usr.username === original);
+                if (idx !== -1) {
+                    appData.users[idx] = userObj;
+                }
+            } else {
+                if (appData.users.some(usr => usr.username === uUsername)) {
+                    alert('اسم المستخدم موجود مسبقاً.');
+                    return;
+                }
+                appData.users.push(userObj);
+            }
+
+            saveToLocalStorage();
+            saveToBothClouds('user', userObj);
+            closeUserModal();
+            renderUsersTable();
+            alert('تم حفظ بيانات المستخدم وصلاحياته بنجاح!');
+        }
+
+        function deleteUser(username) {
+            if (username === 'admin') {
+                alert('لا يمكن حذف حساب مدير النظام الرئيسي.');
+                return;
+            }
+            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                appData.users = appData.users.filter(u => u.username !== username);
+                saveToLocalStorage();
+                deleteFromBothClouds('user', username);
+                renderUsersTable();
+            }
+        }
+
+        // --- التصدير والاستيراد ---
+        function exportData() {
+            if (appData.records.length === 0) {
+                alert('لا توجد بيانات لتصديرها!');
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `elegance_accounts_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dl);
+            dl.click();
+            dl.remove();
+        }
+
+        function importData(event) {
+            const reader = new FileReader();
+            if (event.target.files[0]) {
+                reader.readAsText(event.target.files[0], "UTF-8");
+                reader.onload = function(e) {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if (parsed && parsed.records) {
+                            appData = parsed;
+                            saveToLocalStorage();
+                            renderAll();
+                            alert('تمت استعادة البيانات بنجاح!');
+                        } else {
+                            alert('ملف غير صالح.');
+                        }
+                    } catch (err) {
+                        alert('حدث خطأ أثناء قراءة الملف.');
+                    }
+                    event.target.value = '';
+                };
+            }
+        }
+    </script>
+</body>
+</html>
